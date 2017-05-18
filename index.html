@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Cobalt's Events</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Cobalt">
+        <style>
+            #results {
+                padding-top:60px;
+            }
+            .timestamp {
+                font-size:80%;
+                padding-top:4px;
+            }
+            .type {
+                text-transform: capitalize;
+            }
+            .col-type .type,
+            .col-type .em {
+                margin-right:10px;
+            }
+            .col-type {
+                border: 1px solid;
+                padding:10px 20px;
+                border-radius:4px;
+                margin-bottom:5px;
+            }
+            .type-feed {
+                color: #31708f;
+                background-color: #d9edf7;
+                border-color: #bce8f1;
+            }
+            .type-pee {
+                color: #8a6d3b;
+                background-color: #fcf8e3;
+                border-color: #faebcc;
+            }
+            .type-walk {
+                color: #a94442;
+                background-color: #f2dede;
+                border-color: #ebccd1;
+            }
+            .type-poop {
+                color: #999;
+                background-color: #fff;
+                border-color: #ddd;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Cobalt Events</a>
+            </div>
+          </div>
+        </nav>
+        <div id="results" class="container"></div>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+        <script>
+
+        "use strict";
+
+        const $results = document.querySelector("#results");
+        const DATA_SOURCE_URL = 'https://docs.google.com/spreadsheets/d/1FsKC2sKixV8MhKyu4gbh7qTAu-fbzI-QsXxLy4jRQNs/gviz/tq';
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(onReady);
+
+        function onReady() {
+            const query = new google.visualization.Query(DATA_SOURCE_URL);
+            query.setQuery('select A, B');
+            query.send(onResponse);
+        }
+
+        function onResponse(response) {
+            const items = response.J.qg.reverse();
+            items.forEach(render);
+        }
+
+        const emojis = {
+            poop: 'em-poop',
+            walk: 'em-paw_prints',
+            feed: 'em-fork_and_knife',
+            pee: 'em-sweat_drops'
+        };
+
+        function render(item) {
+            const mom = moment(
+                item.c[0].v.replace(' at ', ' '), 
+                'MMM DD, YYYY hh:mmA'
+            );
+
+            const type = item.c[1].v.replace('cobalt_', '');
+            const $row = document.createElement('div');
+            $row.className = `col-type col-sm-12 type-${type}`;
+
+            const $emoji = document.createElement('span');
+            $emoji.className = `em ${emojis[type]}`;
+
+            const $type = document.createElement('strong');
+            $type.className = 'type';
+            $type.innerHTML = type;
+
+            const $readable = document.createElement('span');
+            $readable.className = 'from-now';
+            $readable.innerHTML = mom.fromNow();
+
+            const $timestamp = document.createElement('small');
+            $timestamp.className = 'timestamp pull-right';
+            $timestamp.innerHTML = mom.format('MMMM Do YYYY, h:mmA');
+
+            $row.appendChild($emoji);
+            $row.appendChild($type);
+            $row.appendChild($readable);
+            $row.appendChild($timestamp);
+
+            $results.appendChild($row);
+        }
+        </script>
+    </body>
+</html>
