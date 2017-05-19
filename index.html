@@ -10,8 +10,21 @@
         <link rel="apple-touch-icon" href="/pi-cobalt-view/apple-touch-icon.png">
         <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
         <style>
-            #results {
+            #frame {
                 padding-top:60px;
+            }
+            #loader {
+                position:fixed;
+                top:50%;
+                left:20%;
+                width:60%;
+                height:20px;
+                margin-top:10px;
+            }
+            #refresh {
+                padding: 10px;
+                outline: none;
+                margin-top:5px;
             }
             .timestamp {
                 font-size:80%;
@@ -55,24 +68,43 @@
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container">
+            <button id="refresh" class="btn-link pull-right">
+                <span class="glyphicon glyphicon-refresh"></span>
+            </button>
             <div class="navbar-header">
               <a class="navbar-brand" href="#">Cobalt Today</a>
             </div>
           </div>
         </nav>
-        <div id="results" class="container"></div>
+        <div class="container" id="frame">
+            <div id="results"></div>
+            <div class="progress" id="loader">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" style="width:100%"></div>
+            </div>
+        </div>
         <script src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
         <script>
 
         "use strict";
 
-        const $results = document.querySelector("#results");
+        const $ = document.querySelector.bind(document);
+        const $results = $("#results");
+        const $refresh = $("#refresh");
+        const $loader = $('#loader');
+
         const DATA_SOURCE_URL = 'https://docs.google.com/spreadsheets/d/1FsKC2sKixV8MhKyu4gbh7qTAu-fbzI-QsXxLy4jRQNs/gviz/tq';
         google.charts.load('current', {packages: ['corechart']});
         google.charts.setOnLoadCallback(onReady);
 
+        $refresh.addEventListener('click', () => {
+            $results.innerHTML = '';
+            onReady();
+        });
+
         function onReady() {
+            $results.style.display = 'none';
+            $loader.style.display = 'block';
             const query = new google.visualization.Query(DATA_SOURCE_URL);
             query.setQuery('select A, B');
             query.send(onResponse);
@@ -81,6 +113,8 @@
         function onResponse(response) {
             const items = response.J.qg.reverse();
             items.forEach(render);
+            $results.style.display = 'block';
+            $loader.style.display = 'none';
         }
 
         const emojis = {
@@ -127,6 +161,7 @@
 
             $results.appendChild($row);
         }
+        
         </script>
     </body>
 </html>
