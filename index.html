@@ -96,6 +96,11 @@
                 'MMM DD, YYYY hh:mmA'
             );
 
+            // Not today
+            if (!mom.isSame(moment(), 'day')) {
+                return;
+            }
+
             const type = item.c[1].v.replace('cobalt_', '');
             const $row = document.createElement('div');
             $row.className = `col-type col-sm-12 type-${type}`;
