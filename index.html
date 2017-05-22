@@ -289,7 +289,7 @@
             localStorage.setItem(blockerKey, Date.now() + 20 * 1000);
 
             // Set the request to IFTTT Maker Webhooks
-            const url = 'http://maker.ifttt.com/trigger/' + eventName + '/with/key/' + key;
+            const url = 'https://maker.ifttt.com/trigger/' + eventName + '/with/key/' + key;
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
             xhr.onload = onHardRefresh;
