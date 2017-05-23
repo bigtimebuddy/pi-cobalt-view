@@ -8,7 +8,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="Cobalt">
         <link rel="apple-touch-icon" href="/pi-cobalt-view/apple-touch-icon.png">
-        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <style>
             body {
                 overflow:hidden;
@@ -54,12 +54,10 @@
                 outline:none;
                 font-size:140%;
                 box-shadow: inset 0 0 2px 2px #fff;
-                transition: background-color 0.3s;
             }
-            #controls button:hover,
             #controls button:active {
-                background-color:#fff;
-                border-color:#666;
+                box-shadow: inset 0 0 2px 100px rgba(0,0,0,0.2);
+                border-color:#333;
             }
             .control-btn {
                 width:25%;
@@ -157,16 +155,16 @@
         </div>
         <div id="controls">
             <div class="control-btn">
-                <button data-event="cobalt_poop" class="trigger btn-link type-poop"><span class="em em-poop"></span></button>
+                <button data-event="cobalt_poop" class="trigger type-poop"><span class="em em-poop"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_walk" class="trigger btn-link type-walk"><span class="em em-paw_prints"></span></button>
+                <button data-event="cobalt_walk" class="trigger type-walk"><span class="em em-paw_prints"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_feed" class="trigger btn-link type-feed"><span class="em em-fork_and_knife"></span></button>
+                <button data-event="cobalt_feed" class="trigger type-feed"><span class="em em-fork_and_knife"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_pee" class="trigger btn-link type-pee"><span class="em em-sweat_drops"></span></button>
+                <button data-event="cobalt_pee" class="trigger type-pee"><span class="em em-sweat_drops"></span></button>
             </div>
         </div>
         <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -292,8 +290,9 @@
             const url = 'https://maker.ifttt.com/trigger/' + eventName + '/with/key/' + key;
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
-            xhr.onload = onHardRefresh;
-            xhr.send();
+            xhr.addEventListener('load', onHardRefresh);
+            xhr.addEventListener('error', onHardRefresh);
+            xhr.send(null);
         }
 
         function render(item) {
