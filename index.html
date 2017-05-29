@@ -160,16 +160,16 @@
         </div>
         <div id="controls">
             <div class="control-btn">
-                <button data-event="cobalt_poop" class="trigger type-poop"><span class="em em-poop"></span></button>
+                <button data-event="cobalt_poop" data-value2="poop" class="trigger type-poop"><span class="em em-poop"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_walk" class="trigger type-walk"><span class="em em-paw_prints"></span></button>
+                <button data-event="cobalt_walk" data-value2="walk" class="trigger type-walk"><span class="em em-paw_prints"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_feed" class="trigger type-feed"><span class="em em-fork_and_knife"></span></button>
+                <button data-event="cobalt_feed" data-value2="feed" class="trigger type-feed"><span class="em em-fork_and_knife"></span></button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_pee" class="trigger type-pee"><span class="em em-sweat_drops"></span></button>
+                <button data-event="cobalt_pee" data-value2="pee" class="trigger type-pee"><span class="em em-sweat_drops"></span></button>
             </div>
         </div>
         <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -280,6 +280,7 @@
         function onTrigger(ev) {
             
             const eventName = ev.currentTarget.dataset.event;
+            const value2 = ev.currentTarget.dataset.value2;
 
             // Trottle events to keep from accidentally triggering
             // more than once at a time
@@ -293,25 +294,24 @@
 
             // Set the request to IFTTT Maker Webhooks
             const url = 'https://maker.ifttt.com/trigger/' + eventName + '/with/key/' + key;
+            const data = 'value1=' + Date.now() + '&value2=' + value2;
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.addEventListener('load', onHardRefresh);
             xhr.addEventListener('error', onHardRefresh);
-            xhr.send(null);
+            xhr.send(data);
         }
 
         function render(item) {
-            const mom = moment(
-                item.c[0].v.replace(' at ', ' '), 
-                'MMM DD, YYYY hh:mmA'
-            );
+            const mom = moment(parseInt(item.c[0].v));
 
             // Not today
             if (!mom.isSame(moment().subtract(index, 'days'), 'day')) {
                 return;
             }
 
-            const type = item.c[1].v.replace('cobalt_', '');
+            const type = item.c[1].v;
             const $row = document.createElement('div');
             $row.className = `col-type col-sm-12 type-${type}`;
 
