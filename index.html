@@ -62,16 +62,44 @@
                 border-color:#333;
             }
             #controls button:active .em {
-                margin-top:6px;
+                margin-top:4px;
             }
             .control-btn {
                 width:25%;
                 float:left;
                 box-sizing: border-box;
                 padding:0 0 0 5px;
+                position:relative;
             }
             .control-btn:last-child {
                 padding-right:5px;
+            }
+            .control-btn.done .control-tooltip {
+                opacity: 1;
+            }
+            .control-tooltip {
+                position: absolute;
+                top: -60px;
+                left: 50%;
+                -webkit-transform: translateX(-50%);
+                transform: translateX(-50%);
+                font-size: 16px;
+                background: rgba(0,0,0,0.2);
+                border-radius: 4px;
+                padding: 10px;
+                opacity: 0;
+                -webkit-transition: opacity 1s;
+                transition: opacity 1s;
+            }
+            .control-tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: rgba(0,0,0,0.2) transparent transparent transparent;
             }
             .navbar-brand {
                 color:#fff !important;
@@ -135,7 +163,7 @@
             }
         </style>
     </head>
-    <body>
+    <body ontouchstart="">
         <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container-fluid">
             <button id="refresh" class="btn-link pull-right navbar-button">
@@ -160,16 +188,28 @@
         </div>
         <div id="controls">
             <div class="control-btn">
-                <button data-event="cobalt_poop" data-value2="poop" class="trigger type-poop"><span class="em em-poop"></span></button>
+                <button data-event="cobalt_poop" data-value2="poop" class="trigger type-poop">
+                    <span class="em em-poop"></span>
+                    <span class="control-tooltip"><span class="em em-thumbsup"></span></span>
+                </button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_walk" data-value2="walk" class="trigger type-walk"><span class="em em-paw_prints"></span></button>
+                <button data-event="cobalt_walk" data-value2="walk" class="trigger type-walk">
+                    <span class="em em-paw_prints"></span>
+                    <span class="control-tooltip"><span class="em em-thumbsup"></span></span>
+                </button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_feed" data-value2="feed" class="trigger type-feed"><span class="em em-fork_and_knife"></span></button>
+                <button data-event="cobalt_feed" data-value2="feed" class="trigger type-feed">
+                    <span class="em em-fork_and_knife"></span>
+                    <span class="control-tooltip"><span class="em em-thumbsup"></span></span>
+                </button>
             </div>
             <div class="control-btn">
-                <button data-event="cobalt_pee" data-value2="pee" class="trigger type-pee"><span class="em em-sweat_drops"></span></button>
+                <button data-event="cobalt_pee" data-value2="pee" class="trigger type-pee">
+                    <span class="em em-sweat_drops"></span>
+                    <span class="control-tooltip"><span class="em em-thumbsup"></span></span>
+                </button>
             </div>
         </div>
         <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -279,8 +319,9 @@
 
         function onTrigger(ev) {
             
-            const eventName = ev.currentTarget.dataset.event;
-            const value2 = ev.currentTarget.dataset.value2;
+            const button = ev.currentTarget;
+            const eventName = button.dataset.event;
+            const value2 = button.dataset.value2;
 
             // Trottle events to keep from accidentally triggering
             // more than once at a time
@@ -298,9 +339,18 @@
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('load', onHardRefresh);
-            xhr.addEventListener('error', onHardRefresh);
+            xhr.addEventListener('load', onButtonDone.bind(null, button.parentNode));
+            xhr.addEventListener('error', onButtonDone.bind(null, button.parentNode));
             xhr.send(data);
+        }
+
+        function onButtonDone(button) {
+            const done = ' done';
+            button.className += done;
+            setTimeout(() => {
+                button.className = button.className.replace(done, '');
+                onHardRefresh();
+            }, 5000);
         }
 
         function render(item) {
